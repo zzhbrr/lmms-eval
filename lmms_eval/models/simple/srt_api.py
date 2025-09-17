@@ -86,10 +86,13 @@ class SRT_API(lmms):
         self.chat_template = chat_template
         self.mem_fraction_static = mem_fraction_static
         other_args = []
-        other_args.extend(["--chunked-prefill-size", str(chunked_prefill_size)])
-        other_args.extend(["--tensor-parallel-size", str(tp)])
-        other_args.extend(["--chat-template", self.chat_template])
-        other_args.extend(["--mem-fraction-static", str(self.mem_fraction_static)])
+        # other_args.extend(["--chunked-prefill-size", str(chunked_prefill_size)])
+        # other_args.extend(["--tensor-parallel-size", str(tp)])
+        # other_args.extend(["--chat-template", self.chat_template])
+        # other_args.extend(["--mem-fraction-static", str(self.mem_fraction_static)])
+        # XXX: my change
+        # --trust-remote-code --enable-multimodal --max-running-requests 100 --disable-cuda-graph --attention-backend triton --dtype bfloat16 --watchdog-timeout 1000000 --disable-radix-cache --triton-attention-reduce-in-fp32 --chunked-prefill-size -1
+        other_args.extend(["--trust-remote-code", "--enable-multimodal", "--max-running-requests", "100", "--disable-cuda-graph", "--attention-backend", "triton", "--dtype", "bfloat16", "--watchdog-timeout", "1000000", "--disable-radix-cache", "--triton-attention-reduce-in-fp32", "--chunked-prefill-size", "-1"])
         self.process = popen_launch_server(
             self.model,
             self.base_url,
@@ -101,6 +104,8 @@ class SRT_API(lmms):
         if self.modality == "video":
             self.client = OpenAI(api_key=self.api_key, base_url=self.base_url)
         else:
+            # XXX: my change
+            # self.client = OpenAI(api_key=self.api_key, base_url=self.base_url)
             self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url)
         self.num_processes = num_processes
         # assert self.batch_size_per_gpu == 1, "Llava currently does not support batched generation. See https://github.com/haotian-liu/LLaVA/issues/754. HF Llava also has this issue."
@@ -182,7 +187,7 @@ class SRT_API(lmms):
                     imgs = None
                     break
 
-        time_instruciton = f"The video lasts for {video_time:.2f} seconds, and {len(frames)} frames are uniformly sampled from it. These frames are located at {frame_time}.Please answer the following questions related to this video."
+                time_instruciton = f"The video lasts for {video_time:.2f} seconds, and {len(frames)} frames are uniformly sampled from it. These frames are located at {frame_time}.Please answer the following questions related to this video."
         if self.add_time_instruction:
             contexts = f"{time_instruciton}\n{contexts}"
         else:
@@ -243,7 +248,7 @@ class SRT_API(lmms):
                     imgs = None
                     break
 
-        time_instruciton = f"The video lasts for {video_time:.2f} seconds, and {len(frames)} frames are uniformly sampled from it. These frames are located at {frame_time}.Please answer the following questions related to this video."
+                time_instruciton = f"The video lasts for {video_time:.2f} seconds, and {len(frames)} frames are uniformly sampled from it. These frames are located at {frame_time}.Please answer the following questions related to this video."
         if self.add_time_instruction:
             contexts = f"{time_instruciton}\n{contexts}"
         else:
@@ -312,6 +317,11 @@ class SRT_API(lmms):
                 res.append(response)
                 pbar.update(1)
         else:
+            # XXX: my change
+            # for req in requests:
+            #     response = self.generate_sync(req)
+            #     res.append(response)
+            #     pbar.update(1)
             asyncio.run(run(requests))
         kill_process_tree(self.process.pid)
 

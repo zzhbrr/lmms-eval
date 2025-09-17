@@ -74,6 +74,7 @@ dependencies = [
     "protobuf",
     "sentence_transformers",
     "python-dotenv",
+    "debugpy>=1.8.16",
 ]
 
 [project.optional-dependencies]
