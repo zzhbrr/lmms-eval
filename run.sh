@@ -1,4 +1,4 @@
-# bash run.sh "/data1/zzh/huggingface/hub/models--google--gemma-3-4b-it/snapshots/093f9f388b31de276ce2de164bdc2081324b9767" "refcoco" "image"
+# bash run.sh /data1/zzh/huggingface/hub/models--google--gemma-3-4b-it/snapshots/093f9f388b31de276ce2de164bdc2081324b9767 refcoco image 1
 CKPT_PATH=$1
 TASK=$2
 MODALITY=$3
@@ -11,7 +11,7 @@ python3 -m lmms_eval \
     --model srt_api \
     --model_args modality=$MODALITY,model_version=$CKPT_PATH,tp=$TP_SIZE,host=127.0.0.1,port=30000 \
     --tasks $TASK \
-    --batch_size 30 \
+    --batch_size 10 \
     --log_samples \
     --log_samples_suffix $TASK_SUFFIX \
     --output_path ./logs/ \
